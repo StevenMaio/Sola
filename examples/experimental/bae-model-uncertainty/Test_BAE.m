@@ -1,3 +1,7 @@
+clear;
+close all;
+clc;
+
 % Inversion with true value of vel_coeff known
 rng(192);
 

@@ -1,10 +1,14 @@
+clear;
+close all;
+clc;
+
 % Inversion with true value of vel_coeff known
 rng(192);
 
 param_dim = 1;
 state_dim = 100;
 diff_coeff = 1e-1;
-vel_coeff = 0.6;    % true value = 1
+vel_coeff = 1.0;    % true value = 1
 
 x = linspace(0, 1, state_dim);
 
@@ -22,7 +26,7 @@ u0 = c_nom.State_Solve(m0);
 
 obs_vec = 9:5:95;
 noise_lvl = 10;
-sigma = noise_lvl / 100 * sqrt(u' * M * u);
+sigma = noise_lvl / 100 * sqrt(u0' * M * u0);
 
 likelihood = Adv_Diff_Likelihood_Model(state_dim, obs_vec, sigma);
 
@@ -31,7 +35,7 @@ d0 = likelihood.Observation_Operator_Apply(u0);
 d0 = d0 + sigma * randn(numel(obs_vec), 1);
 
 figure
-plot(x, u);
+plot(x, u0);
 hold
 scatter(x(obs_vec), d0);
 

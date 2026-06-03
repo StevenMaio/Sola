@@ -1,3 +1,7 @@
+clear;
+close all;
+clc;
+
 % Incorrect Model test. Demonstrating the 
 rng(192);
 
@@ -30,7 +34,7 @@ d0 = likelihood.Observation_Operator_Apply(u0);
 d0 = d0 + sigma * randn(numel(obs_vec), 1);
 
 figure
-plot(x, u);
+plot(x, u0);
 hold
 scatter(x(obs_vec), d0);
 
