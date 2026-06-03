@@ -3,7 +3,7 @@
 %%%%%%%%% Questions? Contact Joseph Hart (joshart@sandia.gov) %%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-classdef Adv_Diff_Constraint < Constraint
+classdef Adv_Diff_Constraint < Parametric_Constraint
 
     properties
         param_dim
@@ -20,48 +20,30 @@ classdef Adv_Diff_Constraint < Constraint
 
     methods (Access = public)
 
-        function [u] = State_Solve(this, z)
+        function [u] = Parametric_State_Solve(this, z, theta)
+            A = this.Construct_Matrix(theta);
             z = z * ones(this.state_dim, 1);
             b = this.M0 * z;
-            u = linsolve(this.A, b);
+            u = linsolve(A, b);
         end
 
-        function [Mv] = c_u_Transpose_Inverse_Apply(this, v, u, z)
+        function [Mv] = Parametric_c_u_Transpose_Inverse_Apply(this, v, u, z, theta)
+            A = this.Construct_Matrix(theta);
             Mv = linsolve(this.A', v);
         end
 
-        function [Mv] = c_z_Apply(this, v, u, z)
+        function [Mv] = Parametric_c_z_Apply(this, v, u, z, theta)
             v = v * ones(this.state_dim, 1);
             Mv = this.M0 * v;
         end
 
-        function [Mv] = c_z_Transpose_Apply(this, v, u, z)
+        function [Mv] = Parametric_c_z_Transpose_Apply(this, v, u, z, theta)
             v = v * ones(this.state_dim, 1);
             Mv = this.M0' * v;
         end
 
-        function [Mv] = c_u_Inverse_Apply(this, v, u, z)
+        function [Mv] = Parametric_c_u_Inverse_Apply(this, v, u, z, theta)
             Mv = linsolve(this.A, v);
-        end
-
-        function [Mv] = c_uu_Apply(this, v, u, z, lambda)
-            % TODO: don't use this. It's probably wrong
-            Mv = zeros(this.state_dim, 1);
-        end
-
-        function [Mv] = c_uz_Apply(this, v, u, z, lambda)
-            % TODO: don't use this. It's probably wrong
-            Mv = zeros(this.state_dim, 1);
-        end
-
-        function [Mv] = c_zu_Apply(this, v, u, z, lambda)
-            % TODO: don't use this. It's probably wrong
-            Mv = zeros(this.state_dim, 1);
-        end
-
-        function [Mv] = c_zz_Apply(this, v, u, z, lambda)
-            % TODO: don't use this. It's probably wrong
-            Mv = zeros(this.state_dim, 1);
         end
 
     end
@@ -69,11 +51,10 @@ classdef Adv_Diff_Constraint < Constraint
     methods (Access = public)
 
         function this = Adv_Diff_Constraint(param_dim, state_dim, diff_coeff, vel_coeff)
-            this = this@Constraint();
+            this@Parametric_Constraint(vel_coeff);
             this.param_dim = param_dim;
             this.state_dim = state_dim;
             this.diff_coeff = diff_coeff;
-            this.vel_coeff = vel_coeff;
             this.x = linspace(0, 1, state_dim)';
 
             h = this.x(2) - this.x(1);
@@ -99,13 +80,18 @@ classdef Adv_Diff_Constraint < Constraint
             V(1, 1) = -1 / 2;
             V(end, end) = 1 / 2;
             this.V = V;
+        end
 
-            A = this.diff_coeff * this.S + this.vel_coeff * this.V;
-            A(1, :) = 0 * A(1, :);
-            A(end, :) = 0 * A(end, :);
-            A(1, 1) = 1;
-            A(end, end) = 1;
-            this.A = A;
+    end
+
+    methods (Access = private)
+
+        function [A] = Construct_Matrix(this, theta)
+              A = this.diff_coeff * this.S + theta * this.V;
+              A(1, :) = 0 * A(1, :);
+              A(end, :) = 0 * A(end, :);
+              A(1, 1) = 1;
+              A(end, end) = 1;
         end
 
     end

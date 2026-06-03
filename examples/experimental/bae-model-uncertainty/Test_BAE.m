@@ -18,13 +18,12 @@ prior_var = 1;
 prior = Adv_Diff_Prior_Model(prior_mean, prior_var);
 
 % true constraint
-c0 = Adv_Diff_Constraint(param_dim, state_dim, diff_coeff, vel_coeff);
-c_nom = Adv_Diff_Constraint(param_dim, state_dim, diff_coeff, vel_coeff_nom);
+c = Adv_Diff_Constraint(param_dim, state_dim, diff_coeff, vel_coeff_nom);
 
-M = c0.M;
+M = c.M;
 
 m0 = 1.0;
-u0 = c0.State_Solve(m0);
+u0 = c.Parametric_State_Solve(m0, vel_coeff);
 
 obs_vec = 9:5:95;
 data_dim = numel(obs_vec);
@@ -40,23 +39,18 @@ d0 = d0 + sigma * randn(data_dim, 1);
 % Compute approximation error sample statistics
 num_samples = 1000;
 
+% sample interesting and auxiliary parameters
 m_samples = randn(num_samples, 1);
 l_samples = .4 + .8 * rand(num_samples, 1);
 samples = zeros(num_samples, data_dim);
 
 for t = 1:num_samples
-    % Sample interesting parameter
-    %m_sample = prior.Prior_Covariance_Factor_Apply(randn(param_dim, 1));
-    % Sample aux parameter
-    %l_sample = .4 * .8 * rand();
-
     % compute accurate forward model for sample
-    c_acc = Adv_Diff_Constraint(param_dim, state_dim, diff_coeff, l_samples(t));
-    u_acc = c_acc.State_Solve(m_samples(t));
+    u_acc = c.Parametric_State_Solve(m_samples(t), l_samples(t));
     d_acc = likelihood.Observation_Operator_Apply(u_acc);
 
     % compute forward of approx model
-    u_approx = c_nom.State_Solve(m_samples(t));
+    u_approx = c.State_Solve(m_samples(t));
     d_approx = likelihood.Observation_Operator_Apply(u_approx);
 
     model_err = d_acc - d_approx;
@@ -69,7 +63,7 @@ error_cov = cov(samples);
 
 bae_likelihood = BAE_Likelihood_Model(likelihood, error_mean, error_cov);
 
-u_nom = c_nom.State_Solve(1.0);
+u_nom = c.State_Solve(1.0);
 f_nom = likelihood.Observation_Operator_Apply(u_nom);
 
 % Compute posterior statistics w/o BAE
