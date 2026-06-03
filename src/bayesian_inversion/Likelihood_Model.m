@@ -43,6 +43,11 @@ classdef Likelihood_Model < handle
             Mv = this.Observation_Operator_Transpose_Apply(u_tmp2);
         end
 
+        function [err_mean] = Get_Error_Mean(this)
+            % Needs to maybe be implemented
+            err_mean = false;
+        end
+
     end
 
 end
