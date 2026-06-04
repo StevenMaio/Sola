@@ -16,7 +16,7 @@ x = linspace(0, 1, state_dim);
 prior_mean = 0;
 prior_var = 1;
 
-prior_distr = Univariate_Gaussian(prior_mean, prior_var);
+prior_distr = Gaussian_Distribution(prior_mean, prior_var);
 aux_distr = Uniform_Distribution(0.4, 1.2);
 
 % Parametric constraint with params set to nominal params
@@ -27,7 +27,7 @@ M = c.M;
 m0 = 1.0;
 u0 = c.Parametric_State_Solve(m0, vel_coeff);
 
-obs_vec = 9:5:95;
+obs_vec = 5:5:95;
 data_dim = numel(obs_vec);
 noise_lvl = 10;
 sigma = noise_lvl / 100 * sqrt(u0' * M * u0);

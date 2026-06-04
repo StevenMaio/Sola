@@ -8,8 +8,8 @@ classdef BAE_Aux_Params_Only_Likelihood < Likelihood_Model
     properties
         noise_likelihood % original likelihood model
         num_samples
-        error_mean
-        error_cov
+        e0
+        G_ee
         % distributions
         param_distr
         aux_distr
@@ -22,7 +22,7 @@ classdef BAE_Aux_Params_Only_Likelihood < Likelihood_Model
         end
 
         function [d_out] = Noise_Covariance_Apply(this, d_in)
-            d_out = this.error_cov * d_in + this.noise_likelihood.Noise_Covariance_Apply(d_in);
+            d_out = this.G_ee * d_in + this.noise_likelihood.Noise_Covariance_Apply(d_in);
         end
 
         function [d_out] = Observation_Operator_Apply(this, u_in)
@@ -38,7 +38,7 @@ classdef BAE_Aux_Params_Only_Likelihood < Likelihood_Model
         end
 
         function [d] = Get_Error_Mean(this)
-            d = this.error_mean + this.noise_likelihood.Get_Error_Mean();
+            d = this.e0 + this.noise_likelihood.Get_Error_Mean();
         end
 
     end
@@ -65,8 +65,8 @@ classdef BAE_Aux_Params_Only_Likelihood < Likelihood_Model
                 err_samples(i, :) = err;
             end
 
-            this.error_mean = mean(err_samples)';
-            this.error_cov = cov(err_samples);
+            this.e0 = mean(err_samples)';
+            this.G_ee = cov(err_samples);
         end
 
     end

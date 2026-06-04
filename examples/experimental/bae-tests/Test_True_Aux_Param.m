@@ -2,34 +2,35 @@ clear;
 close all;
 clc;
 
-% Incorrect Model test. Demonstrating the 
+% Inversion with true value of vel_coeff known
 rng(192);
 
 param_dim = 1;
 state_dim = 100;
 diff_coeff = 1e-1;
-vel_coeff = 0.6;    % true value = 1
+vel_coeff = 1.0;    % true value = 1
 
 x = linspace(0, 1, state_dim);
 
 prior_mean = 0;
 prior_var = 1;
-prior = Adv_Diff_Prior_Model(prior_mean, prior_var);
+prior = Adv_Diff_Prior_Model(prior_mean, sqrt(prior_var));
 
 % true constraint
-c0 = Adv_Diff_Constraint(param_dim, state_dim, diff_coeff, vel_coeff);
+c_nom = Adv_Diff_Constraint(param_dim, state_dim, diff_coeff, vel_coeff);
 
-M = c0.M;
+M = c_nom.M;
 
 m0 = 1.0;
-u0 = c0.State_Solve(m0);
+u0 = c_nom.State_Solve(m0);
 
-obs_vec = 9:5:95;
+obs_vec = 5:5:95;
 noise_lvl = 10;
 sigma = noise_lvl / 100 * sqrt(u0' * M * u0);
 
 likelihood = Adv_Diff_Likelihood_Model(state_dim, obs_vec, sigma);
 
+% actual observed data
 d0 = likelihood.Observation_Operator_Apply(u0);
 d0 = d0 + sigma * randn(numel(obs_vec), 1);
 
