@@ -34,6 +34,10 @@ classdef Adv_Diff_Likelihood_Model < Likelihood_Model
             d = false;
         end
 
+        function [d] = Get_Error_Mean(this)
+            d = zeros(numel(this.obs_vec), 1);
+        end
+
     end
 
     methods (Access = public)

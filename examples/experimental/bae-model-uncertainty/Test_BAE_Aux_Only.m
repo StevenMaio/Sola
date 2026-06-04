@@ -15,9 +15,11 @@ x = linspace(0, 1, state_dim);
 
 prior_mean = 0;
 prior_var = 1;
-prior = Adv_Diff_Prior_Model(prior_mean, prior_var);
 
-% true constraint
+prior_distr = Univariate_Gaussian(prior_mean, prior_var);
+aux_distr = Uniform_Distribution(0.4, 1.2);
+
+% Parametric constraint with params set to nominal params
 c = Adv_Diff_Constraint(param_dim, state_dim, diff_coeff, vel_coeff_nom);
 
 M = c.M;
@@ -39,29 +41,13 @@ d0 = d0 + sigma * randn(data_dim, 1);
 % Compute approximation error sample statistics
 num_samples = 1000;
 
-% sample interesting and auxiliary parameters
-m_samples = randn(num_samples, 1);
-l_samples = .4 + .8 * rand(num_samples, 1);
-samples = zeros(num_samples, data_dim);
+full_F = @(m, xi) likelihood.Observation_Operator_Apply(c.Parametric_State_Solve(m, xi));
+approximate_F = @(m) likelihood.Observation_Operator_Apply(c.State_Solve(m));
 
-for t = 1:num_samples
-    % compute accurate forward model for sample
-    u_acc = c.Parametric_State_Solve(m_samples(t), l_samples(t));
-    d_acc = likelihood.Observation_Operator_Apply(u_acc);
-
-    % compute forward of approx model
-    u_approx = c.State_Solve(m_samples(t));
-    d_approx = likelihood.Observation_Operator_Apply(u_approx);
-
-    model_err = d_acc - d_approx;
-    samples(t, :) = model_err;
-end
-
-% compute error sample statistics
-error_mean = mean(samples);
-error_cov = cov(samples);
-
-bae_likelihood = BAE_Likelihood_Model(likelihood, error_mean, error_cov);
+bae_likelihood = BAE_Aux_Params_Only_Likelihood(...
+    full_F, ...
+    approximate_F, ...
+    likelihood, prior_distr, aux_distr, num_samples);
 
 u_nom = c.State_Solve(1.0);
 f_nom = likelihood.Observation_Operator_Apply(u_nom);
@@ -72,7 +58,7 @@ nom_post_var = 1 / (prior_var^(-2) + f_nom' * likelihood.Noise_Precision_Apply(f
 nom_post_mean = map_rhs * nom_post_var;
 
 % Compute posterior statistics w/ BAE
-map_rhs = f_nom' * bae_likelihood.Noise_Precision_Apply(d0);
+map_rhs = f_nom' * (bae_likelihood.Noise_Precision_Apply(d0) - bae_likelihood.Get_Error_Mean());
 bae_post_var = 1 / (prior_var^(-2) + f_nom' * bae_likelihood.Noise_Precision_Apply(f_nom));
 bae_post_mean = map_rhs * bae_post_var;
 

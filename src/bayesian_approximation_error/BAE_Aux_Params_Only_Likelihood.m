@@ -1,0 +1,74 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%      Sola - Sandbox for Outer Loop Analysis         %%%%%%%%%
+%%%%%%%%% Questions? Contact Joseph Hart (joshart@sandia.gov) %%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+classdef BAE_Aux_Params_Only_Likelihood < Likelihood_Model
+
+    properties
+        noise_likelihood % original likelihood model
+        num_samples
+        error_mean
+        error_cov
+        % distributions
+        param_distr
+        aux_distr
+    end
+
+    methods (Access = public)
+
+        function [d_out] = Noise_Precision_Apply(this, d_in)
+            d_out = cgs(@(d) this.Noise_Covariance_Apply(d), d_in);
+        end
+
+        function [d_out] = Noise_Covariance_Apply(this, d_in)
+            d_out = this.error_cov * d_in + this.noise_likelihood.Noise_Covariance_Apply(d_in);
+        end
+
+        function [d_out] = Observation_Operator_Apply(this, u_in)
+            d_out = this.noise_likelihood.Observation_Operator_Apply(u_in);
+        end
+
+        function [u_out] = Observation_Operator_Transpose_Apply(this, d_in)
+            u_out = this.noise_likelihood.Observation_Operator_Transpose_Apply(d_in);
+        end
+
+        function [d] = Get_Observed_Data(this)
+            d = false;
+        end
+
+        function [d] = Get_Error_Mean(this)
+            d = this.error_mean + this.noise_likelihood.Get_Error_Mean();
+        end
+
+    end
+
+    methods (Access = public)
+
+        function this = BAE_Aux_Params_Only_Likelihood(full_F, approximate_F, ...
+                noise_likelihood, param_distr, aux_distr, num_samples)
+            this.noise_likelihood = noise_likelihood;
+            this.param_distr = param_distr;
+            this.aux_distr = aux_distr;
+            this.num_samples = num_samples;
+
+            param_samples = zeros(num_samples, param_distr.dim);
+            aux_samples = zeros(num_samples, aux_distr.dim);
+            err_samples = [];
+
+            for i = 1:num_samples
+                m = param_distr.Sample();
+                xi = aux_distr.Sample();
+                param_samples(i, :) = m;
+                aux_samples(i, :) = xi;
+                err = full_F(m, xi) - approximate_F(m);
+                err_samples(i, :) = err;
+            end
+
+            this.error_mean = mean(err_samples)';
+            this.error_cov = cov(err_samples);
+        end
+
+    end
+
+end
