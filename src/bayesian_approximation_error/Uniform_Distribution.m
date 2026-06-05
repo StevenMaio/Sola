@@ -1,4 +1,12 @@
+%   Uniform_Distribution
+%
+%   Author(s):
+%       - Steven Maio (smaio@sandia.gov or smaio@ncsu.edu)
+
 classdef Uniform_Distribution < Sampler_Interface
+    %% Uniform_Distribution
+    %   Implementation of a sampleable finite uniform distribution.
+
     properties
       a
       b
@@ -23,7 +31,7 @@ classdef Uniform_Distribution < Sampler_Interface
         end
 
         function [x_out] = Get_Mean(this)
-            x_out = (a + b) / 2;
+            x_out = (this.a + this.b) / 2;
         end
     end
 end

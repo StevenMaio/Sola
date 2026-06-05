@@ -3,13 +3,14 @@
 %%%%%%%%% Questions? Contact Joseph Hart (joshart@sandia.gov) %%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-classdef Inf_Dim_Prior_Model < Prior_Model
+classdef Inf_Dim_Prior_Model < Prior_Model & Sampler_Interface
 
     % We assume a Bayesian inverse problem with a mean zero Gaussian noise
     % model and a linear observation operator
 
     properties
         mass_mat_sqrt
+        dim
     end
 
     methods (Abstract, Access = public)
@@ -32,8 +33,14 @@ classdef Inf_Dim_Prior_Model < Prior_Model
 
     methods (Access = public)
 
-        function this = Inf_Dim_Prior_Model()
+        function this = Inf_Dim_Prior_Model(dim)
+            arguments
+                dim = -1    % optional to preserve compatibility.
+                            % Only required if you need to use the
+                            % Sampler_Interface functionality
+            end
             this.mass_mat_sqrt = Mass_Matrix_Sqrt(this);
+            this.dim = dim;
         end
 
         function [z_out] = Prior_Precision_Apply(this, z_in)
@@ -51,6 +58,15 @@ classdef Inf_Dim_Prior_Model < Prior_Model
         function [z_out] = Prior_Covariance_Factor_Apply(this, z_in)
             tmp = this.mass_mat_sqrt.Matrix_Sqrt_Apply(z_in);
             z_out = this.Laplacian_Like_Inverse_Apply(tmp);
+        end
+
+        function [z_out] = Sample(this)
+            z = randn(this.dim, 1);
+            z_out = this.Get_Prior_Mean() + this.Prior_Covariance_Factor_Apply(z);
+        end
+
+        function dim = Dimension(this)
+            dim = this.dim;
         end
 
     end

@@ -2,8 +2,24 @@
 %%%%%%%%%      Sola - Sandbox for Outer Loop Analysis         %%%%%%%%%
 %%%%%%%%% Questions? Contact Joseph Hart (joshart@sandia.gov) %%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%   Author(s):
+%       - Steven Maio (smaio@sandia.gov or smaio@ncsu.edu)
 
 classdef BAE_Params_Only_Likelihood < Likelihood_Model
+    %% BAE_Params_Only_Likelihood
+    %   Bayesian approximation error (BAE) error that only deals with
+    %   premarginalizing the approximation error due to the parameter of
+    %   interest [1]. [2] applies this approach to OED.
+    %
+    %   NOTE: We assume that the initial noise error has mean zero.
+    %
+    %   Sources:
+    %       [1]: Ruanui Nicholson et al 2023 Inverse Problems 39 054001
+    %       [2]: Koval, K., Nicholson, R. Non-intrusive optimal experimental
+    %            design for large-scale nonlinear Bayesian inverse problems
+    %            using a Bayesian approximation error approach. J Sci Comput
+    %            104, 98 (2025). https://doi.org/10.1007/s10915-025-03008-7
 
     properties
         noise_likelihood % original likelihood model
@@ -48,23 +64,23 @@ classdef BAE_Params_Only_Likelihood < Likelihood_Model
         end
 
         function [d] = Get_Error_Mean(this)
-            d = this.e0 + this.noise_likelihood.Get_Error_Mean() - this.b;
+            d = this.e0 - this.b;
         end
 
     end
 
     methods (Access = public)
 
-        function this = BAE_Params_Only_Likelihood(full_F, approximate_F, ...
+        function this = BAE_Params_Only_Likelihood(full_cons, approximate_cons, ...
                 noise_likelihood, param_distr, num_samples, d, M)
             arguments
-                full_F
-                approximate_F
-                noise_likelihood
-                param_distr
+                full_cons Constraint
+                approximate_cons Constraint
+                noise_likelihood Likelihood_Model
+                param_distr Sampler_Interface
                 num_samples
-                d
-                M = @(m) m
+                d               % data vector
+                M = @(m) m      % mass matrix
             end
             this.noise_likelihood = noise_likelihood;
             this.param_distr = param_distr;
@@ -74,6 +90,9 @@ classdef BAE_Params_Only_Likelihood < Likelihood_Model
 
             param_samples = zeros(num_samples, param_distr.Dimension());
             err_samples = [];
+
+            full_F = @(m) noise_likelihood.Observation_Operator_Apply(full_cons.State_Solve(m));
+            approximate_F = @(m) noise_likelihood.Observation_Operator_Apply(approximate_cons.State_Solve(m));
 
             for i = 1:num_samples
                 m = param_distr.Sample();

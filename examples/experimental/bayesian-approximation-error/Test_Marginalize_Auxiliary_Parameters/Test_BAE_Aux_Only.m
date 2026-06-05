@@ -2,6 +2,8 @@ clear;
 close all;
 clc;
 
+addpath('../');
+
 % Inversion with true value of vel_coeff known
 rng(192);
 
@@ -25,29 +27,33 @@ c = Adv_Diff_Constraint(param_dim, state_dim, diff_coeff, vel_coeff_nom);
 M = c.M;
 
 m0 = 1.0;
-u0 = c.Parametric_State_Solve(m0, vel_coeff);
+u0 = c.Parametric_State_Solve(m0, vel_coeff);   % true state
+u_nom = c.State_Solve(m0);
+
 
 obs_vec = 5:5:95;
 data_dim = numel(obs_vec);
 noise_lvl = 10;
 sigma = noise_lvl / 100 * sqrt(u0' * M * u0);
 
-likelihood = Adv_Diff_Likelihood_Model(state_dim, obs_vec, sigma);
+likelihood = BAE_Test_Likelihood(state_dim, obs_vec, sigma);
 
 % actual observed data
 d0 = likelihood.Observation_Operator_Apply(u0);
 d0 = d0 + sigma * randn(data_dim, 1);
 
+figure
+plot(x, u0);
+hold
+plot(x, u_nom, '--');
+scatter(x(obs_vec), d0);
+legend({'True State', 'Approx State', 'Data'});
+
 % Compute approximation error sample statistics
 num_samples = 1000;
 
-full_F = @(m, xi) likelihood.Observation_Operator_Apply(c.Parametric_State_Solve(m, xi));
-approximate_F = @(m) likelihood.Observation_Operator_Apply(c.State_Solve(m));
-
 bae_likelihood = BAE_Aux_Params_Only_Likelihood(...
-    full_F, ...
-    approximate_F, ...
-    likelihood, prior_distr, aux_distr, num_samples);
+    c, c, likelihood, prior_distr, aux_distr, num_samples, d0);
 
 u_nom = c.State_Solve(1.0);
 f_nom = likelihood.Observation_Operator_Apply(u_nom);

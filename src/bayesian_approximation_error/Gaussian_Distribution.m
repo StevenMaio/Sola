@@ -1,10 +1,17 @@
+%   Gaussian_Distribution
+%
+%   Author(s):
+%       - Steven Maio (smaio@sandia.gov or smaio@ncsu.edu)
+
 classdef Gaussian_Distribution < Sampler_Interface & Prior_Model
+    %% Gaussian_Distribution
+    %   Implementation of a sampleable finite dimensional Guassian distribution.
 
     properties
-        mu
-        sigma
+        mu      % mean
+        sigma   % covariance matrix
         dim
-        R
+        R       % cholesky factorization of covariance matrix
     end
 
     methods (Access = public)

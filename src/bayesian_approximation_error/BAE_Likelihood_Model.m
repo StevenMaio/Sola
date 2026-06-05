@@ -1,7 +1,7 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%      Sola - Sandbox for Outer Loop Analysis         %%%%%%%%%
-%%%%%%%%% Questions? Contact Joseph Hart (joshart@sandia.gov) %%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   BAE_Likelihood_Model
+%
+%   Author(s):
+%       - Steven Maio (smaio@sandia.gov or smaio@ncsu.edu)
 
 classdef BAE_Likelihood_Model < Likelihood_Model
 

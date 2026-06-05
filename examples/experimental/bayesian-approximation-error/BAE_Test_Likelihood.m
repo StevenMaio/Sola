@@ -3,7 +3,7 @@
 %%%%%%%%% Questions? Contact Joseph Hart (joshart@sandia.gov) %%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-classdef Adv_Diff_Likelihood_Model < Likelihood_Model
+classdef BAE_Test_Likelihood < Likelihood_Model
 
     properties
         sigma
@@ -42,7 +42,7 @@ classdef Adv_Diff_Likelihood_Model < Likelihood_Model
 
     methods (Access = public)
 
-        function this = Adv_Diff_Likelihood_Model(state_dim, obs_vec, sigma)
+        function this = BAE_Test_Likelihood(state_dim, obs_vec, sigma)
             this.sigma = sigma;
             this.obs_vec = obs_vec;
             this.state_dim = state_dim;

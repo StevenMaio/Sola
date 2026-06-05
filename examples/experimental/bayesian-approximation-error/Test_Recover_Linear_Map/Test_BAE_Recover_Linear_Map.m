@@ -2,13 +2,14 @@ clear;
 close all;
 clc;
 
+addpath('../');
 %% Test the simple forward problem
 rng(192);
 
-param_dim = 100;
-state_dim = 100;
+param_dim = 250;
+state_dim = 500;
 noise_lvl = 5;
-num_samples = 1000;
+num_samples = 500;
 
 A = randn(state_dim, param_dim);
 prior = Gaussian_Distribution(zeros(param_dim, 1), eye(param_dim));
@@ -18,13 +19,13 @@ u0 = A * m0;
 sigma = (noise_lvl / 100) * (max(u0) - min(u0));
 d0 = u0 + sigma * randn(size(u0));
 
-full_F = @(x) A * x;
-approx_F = @(x) zeros(state_dim, 1);
+full_cons = Linear_Constraint(A);
+approx_cons = Zero_Constraint(state_dim);
 
-likelihood = Adv_Diff_Likelihood_Model(state_dim, 1:state_dim, sigma);
+likelihood = BAE_Test_Likelihood(state_dim, 1:state_dim, sigma);
 
 bae_likelihood = BAE_Params_Only_Likelihood(...
-    full_F, approx_F, likelihood, prior, num_samples, d0);
+    full_cons, approx_cons, likelihood, prior, num_samples, d0);
 
 F_tilde = zeros(state_dim, param_dim);
 for i = 1:param_dim
