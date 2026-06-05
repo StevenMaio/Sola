@@ -18,7 +18,7 @@ x = linspace(0, 1, state_dim);
 prior_mean = 0;
 prior_var = 1;
 
-prior_distr = Gaussian_Distribution(prior_mean, prior_var);
+prior = Gaussian_Distribution(prior_mean, prior_var);
 aux_distr = Uniform_Distribution(0.4, 1.2);
 
 % Parametric constraint with params set to nominal params
@@ -53,7 +53,7 @@ legend({'True State', 'Approx State', 'Data'});
 num_samples = 1000;
 
 bae_likelihood = BAE_Aux_Params_Only_Likelihood(...
-    c, c, likelihood, prior_distr, aux_distr, num_samples, d0);
+    c, c, likelihood, prior, aux_distr, num_samples, d0);
 
 u_nom = c.State_Solve(1.0);
 f_nom = likelihood.Observation_Operator_Apply(u_nom);
@@ -80,3 +80,8 @@ plot(pdf_support, nom_post_rho);
 plot(pdf_support, bae_post_rho, '-.');
 xline(m0, '--');
 legend({'No BAE', 'BAE', 'True m'})
+
+%% Try using Sola tools
+inversion_problem = Bayesian_Inversion(bae_likelihood, prior, c);
+inversion_problem.opt.Gauss_Newton_Hess = true;
+[u_map, m_map] = inversion_problem.Compute_MAP_Point(0);

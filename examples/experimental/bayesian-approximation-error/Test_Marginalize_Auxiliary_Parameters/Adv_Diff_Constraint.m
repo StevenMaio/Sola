@@ -14,7 +14,6 @@ classdef Adv_Diff_Constraint < Parametric_Constraint
         M
         M0
         S
-        A
         V
     end
 
@@ -28,8 +27,8 @@ classdef Adv_Diff_Constraint < Parametric_Constraint
         end
 
         function [Mv] = Parametric_c_u_Transpose_Inverse_Apply(this, v, u, z, theta)
-            A = this.Construct_Matrix(theta);
-            Mv = linsolve(this.A', v);
+            A = -this.Construct_Matrix(theta);
+            Mv = linsolve(A', v);
         end
 
         function [Mv] = Parametric_c_z_Apply(this, v, u, z, theta)
@@ -37,13 +36,14 @@ classdef Adv_Diff_Constraint < Parametric_Constraint
             Mv = this.M0 * v;
         end
 
-        function [Mv] = Parametric_c_z_Transpose_Apply(this, v, u, z, theta)
-            v = v * ones(this.state_dim, 1);
-            Mv = this.M0' * v;
+        function [Mv] = Parametric_c_z_Transpose_Apply(this, u_in, u, z, theta)
+            v = this.M0' * ones(this.state_dim, 1);
+            Mv = v' * u_in;
         end
 
         function [Mv] = Parametric_c_u_Inverse_Apply(this, v, u, z, theta)
-            Mv = linsolve(this.A, v);
+            A = this.Construct_Matrix(theta);
+            Mv = -linsolve(A, v);
         end
 
     end
