@@ -45,7 +45,11 @@ classdef Gaussian_Distribution < Sampler_Interface & Prior_Model
         end
 
         function [x_out] = Prior_Precision_Apply(this, x_in)
-          [x_out, ~] = cgs(this.sigma, x_in);
+            x_out = zeros(size(x_in));
+            for i = 1:size(x_in, 2)
+                [temp, ~] = cgs(this.sigma, x_in(:, i));
+                x_out(:, i) = temp;
+            end
         end
 
     end

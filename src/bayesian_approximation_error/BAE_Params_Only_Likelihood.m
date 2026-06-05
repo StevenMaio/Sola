@@ -41,7 +41,11 @@ classdef BAE_Params_Only_Likelihood < Likelihood_Model
     methods (Access = public)
 
         function [d_out] = Noise_Precision_Apply(this, d_in)
-            [d_out, ~] = cgs(@(d) this.Noise_Covariance_Apply(d), d_in);
+            d_out = zeros(size(d_in));
+            for i = 1:size(d_in, 2)
+                [temp, ~] = cgs(@(d) this.Noise_Covariance_Apply(d), d_in(:, i));
+                d_out(:, i) = temp;
+            end
         end
 
         function [d_out] = Noise_Covariance_Apply(this, d_in)
