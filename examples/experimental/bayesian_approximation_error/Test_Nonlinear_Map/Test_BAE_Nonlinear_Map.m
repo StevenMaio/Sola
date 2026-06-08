@@ -30,9 +30,9 @@ d0 = d0 + sigma * randn(size(d0));
 
 likelihood = BAE_Test_Likelihood(state_dim, obs_vec, sigma);
 
-figure
+figure;
 plot(x, u0);
-hold
+hold;
 plot(x, full_cons.State_Solve(m0));
 scatter(x(obs_vec), d0);
 
@@ -40,14 +40,14 @@ for i = 1:10
     plot(x, full_cons.State_Solve(prior.Sample()), '--');
 end
 
-legend({'True State', 'Approximate State', 'Data'})
+legend({'True State', 'Approximate State', 'Data'});
 title('Truth and Samples');
 
 %% BAE
 num_samples = 100;
 
-bae_likelihood = BAE_Params_Only_Likelihood(...
-    full_cons, approx_cons, likelihood, prior, num_samples, d0);
+bae_likelihood = BAE_Params_Only_Likelihood( ...
+                                            full_cons, approx_cons, likelihood, prior, num_samples, d0);
 
 f = likelihood.Observation_Operator_Apply(approx_cons.State_Solve(1));
 f_tilde = f + bae_likelihood.Apply_Linear_Correction(1);
@@ -73,9 +73,9 @@ pdf_support = linspace(0.5, 2, 500);
 bae_post_rho = normpdf(pdf_support, bae_map_estimate, bae_post_var);
 no_bae_post_rho = normpdf(pdf_support, no_bae_map_estimate, no_bae_post_var);
 
-figure
-hold
+figure;
+hold;
 plot(pdf_support, no_bae_post_rho, '-.');
 plot(pdf_support, bae_post_rho);
 xline(m0, '--');
-legend({'No BAE', 'BAE', 'True m'})
+legend({'No BAE', 'BAE', 'True m'});

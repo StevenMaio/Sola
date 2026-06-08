@@ -16,7 +16,7 @@ classdef Linearized_Poisson_Constraint < Constraint
         end
 
         function [u_out] = c_u_Transpose_Inverse_Apply(this, u_in, u, z)
-            u_out = - u_in;
+            u_out = -u_in;
         end
 
         function [z_out] = c_z_Transpose_Apply(this, u_in, u, z)
@@ -26,11 +26,11 @@ classdef Linearized_Poisson_Constraint < Constraint
         end
 
         function [u_out] = c_u_Inverse_Apply(this, u_in, u, z)
-            u_out = - u_in;
+            u_out = -u_in;
         end
 
         function [u_out] = c_z_Apply(this, z_in, u, z)
-            u_out = - this.u0 .* z_in;
+            u_out = -this.u0 .* z_in;
         end
 
         % Hess vec applies
@@ -49,7 +49,7 @@ classdef Linearized_Poisson_Constraint < Constraint
         function [z_out] = c_zz_Apply(this, z_in, u, z, lambda)
             z_out = zeros(this.dim, 1);
         end
-        
+
     end
 
     methods
@@ -64,11 +64,11 @@ classdef Linearized_Poisson_Constraint < Constraint
             M0(:, 1) = 0 * M0(:, 1);
             M0(:, end) = 0 * M0(:, end);
             % Maybe incorporate these?
-            %M0(1, 1) = 1;
-            %M0(end, end);
+            % M0(1, 1) = 1;
+            % M0(end, end);
             this.M0 = M0;
         end
 
     end
-    
+
 end

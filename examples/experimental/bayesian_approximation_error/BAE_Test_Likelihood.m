@@ -9,6 +9,7 @@ classdef BAE_Test_Likelihood < Likelihood_Model
         sigma
         obs_vec
         state_dim
+        d
     end
 
     methods (Access = public)
@@ -31,7 +32,7 @@ classdef BAE_Test_Likelihood < Likelihood_Model
         end
 
         function [d] = Get_Observed_Data(this)
-            d = false;
+            d = this.d;
         end
 
         function [d] = Get_Error_Mean(this)

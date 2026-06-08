@@ -8,9 +8,9 @@ classdef Uniform_Distribution < Sampler_Interface
     %   Implementation of a sampleable finite uniform distribution.
 
     properties
-      a
-      b
-      dim
+        a
+        b
+        dim
     end
 
     methods (Access = public)
@@ -33,5 +33,6 @@ classdef Uniform_Distribution < Sampler_Interface
         function [x_out] = Get_Mean(this)
             x_out = (this.a + this.b) / 2;
         end
+
     end
 end

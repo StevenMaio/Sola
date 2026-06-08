@@ -67,7 +67,7 @@ classdef BAE_Aux_Params_Only_Likelihood < Likelihood_Model
     methods (Access = public)
 
         function this = BAE_Aux_Params_Only_Likelihood(full_cons, approximate_cons, ...
-                noise_likelihood, param_distr, aux_distr, num_samples, d)
+                                                       noise_likelihood, param_distr, aux_distr, num_samples, d)
             arguments
                 full_cons Parametric_Constraint
                 approximate_cons Constraint
@@ -86,7 +86,6 @@ classdef BAE_Aux_Params_Only_Likelihood < Likelihood_Model
             param_samples = zeros(num_samples, param_distr.dim);
             aux_samples = zeros(num_samples, aux_distr.dim);
             err_samples = [];
-
 
             full_F = @(m, xi) noise_likelihood.Observation_Operator_Apply(full_cons.Parametric_State_Solve(m, xi));
             approximate_F = @(m) noise_likelihood.Observation_Operator_Apply(approximate_cons.State_Solve(m));

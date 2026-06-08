@@ -11,7 +11,7 @@ classdef BAE_Likelihood_Model < Likelihood_Model
         error_mean
         error_cov
         % only needed for model discrepancy
-        param_mean 
+        param_mean
         param_cov
         cross_cov   % param/error cross covariance
         % distributions
@@ -50,8 +50,8 @@ classdef BAE_Likelihood_Model < Likelihood_Model
     methods (Access = public)
 
         function this = BAE_Likelihood_Model(full_F, approximate_F, ...
-                noise_likelihood, param_distr, aux_distr, num_samples, ...
-                only_aux_params)
+                                             noise_likelihood, param_distr, aux_distr, num_samples, ...
+                                             only_aux_params)
             arguments
                 full_F
                 approximate_F
@@ -88,9 +88,9 @@ classdef BAE_Likelihood_Model < Likelihood_Model
             if ~only_aux_params
                 this.param_mean = mean(param_samples)';
                 this.param_cov = cov(param_samples);
-    
+
                 this.cross_cov = zeros(size(param_samples, 2), size(err_samples, 2));
-    
+
                 for i = 1:num_samples
                     param_contrib = param_samples(i, :)' - this.param_mean;
                     error_contrib = err_samples(i, :)' - this.error_mean;

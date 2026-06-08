@@ -20,24 +20,24 @@ classdef Nonlinear_Poisson_Constraint < Constraint
 
         function [u_out] = c_u_Transpose_Inverse_Apply(this, u_in, u, z)
             % Ignore this
-            u_out = - u_in;
+            u_out = -u_in;
         end
 
         function [z_out] = c_z_Transpose_Apply(this, u_in, u, z)
             % Ignore this
-            z_out = - u_in .* this.u0;
+            z_out = -u_in .* this.u0;
         end
 
         function [u_out] = c_u_Inverse_Apply(this, u_in, u, z)
             % Ignore this
-            u_out = - u_in;
+            u_out = -u_in;
         end
 
         function [u_out] = c_z_Apply(this, z_in, u, z)
             % Ignore this
-            u_out = - this.u0 .* z_in;
+            u_out = -this.u0 .* z_in;
         end
-        
+
     end
 
     methods
@@ -72,10 +72,10 @@ classdef Nonlinear_Poisson_Constraint < Constraint
     end
 
     methods (Access = private)
-          
+
         function [A] = Construct_Matrix(this, z)
             A = this.S;
-            v = exp(z/2);
+            v = exp(z / 2);
             A = diag(v) * A * diag(v);
             % Apply lifting to maintain BCs
             A(1, :) = 0 * A(1, :);

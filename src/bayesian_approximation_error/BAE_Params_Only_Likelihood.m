@@ -76,7 +76,7 @@ classdef BAE_Params_Only_Likelihood < Likelihood_Model
     methods (Access = public)
 
         function this = BAE_Params_Only_Likelihood(full_cons, approximate_cons, ...
-                noise_likelihood, param_distr, num_samples, d, M)
+                                                   noise_likelihood, param_distr, num_samples, d, M)
             arguments
                 full_cons Constraint
                 approximate_cons Constraint

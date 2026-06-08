@@ -30,7 +30,6 @@ m0 = 1.0;
 u0 = c.Parametric_State_Solve(m0, vel_coeff);   % true state
 u_nom = c.State_Solve(m0);
 
-
 obs_vec = 5:5:95;
 data_dim = numel(obs_vec);
 noise_lvl = 10;
@@ -42,9 +41,9 @@ likelihood = BAE_Test_Likelihood(state_dim, obs_vec, sigma);
 d0 = likelihood.Observation_Operator_Apply(u0);
 d0 = d0 + sigma * randn(data_dim, 1);
 
-figure
+figure;
 plot(x, u0);
-hold
+hold;
 plot(x, u_nom, '--');
 scatter(x(obs_vec), d0);
 legend({'True State', 'Approx State', 'Data'});
@@ -52,8 +51,8 @@ legend({'True State', 'Approx State', 'Data'});
 % Compute approximation error sample statistics
 num_samples = 1000;
 
-bae_likelihood = BAE_Aux_Params_Only_Likelihood(...
-    c, c, likelihood, prior, aux_distr, num_samples, d0);
+bae_likelihood = BAE_Aux_Params_Only_Likelihood( ...
+                                                c, c, likelihood, prior, aux_distr, num_samples, d0);
 
 u_nom = c.State_Solve(1.0);
 f_nom = likelihood.Observation_Operator_Apply(u_nom);
@@ -74,12 +73,12 @@ prior_rho = normpdf(pdf_support, prior_mean, prior_var);
 bae_post_rho = normpdf(pdf_support, bae_post_mean, bae_post_var);
 nom_post_rho = normpdf(pdf_support, nom_post_mean, nom_post_var);
 
-figure
-hold
+figure;
+hold;
 plot(pdf_support, nom_post_rho);
 plot(pdf_support, bae_post_rho, '-.');
 xline(m0, '--');
-legend({'No BAE', 'BAE', 'True m'})
+legend({'No BAE', 'BAE', 'True m'});
 
 %% Try using Sola tools
 inversion_problem = Bayesian_Inversion(bae_likelihood, prior, c);

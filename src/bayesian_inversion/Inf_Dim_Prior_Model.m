@@ -36,8 +36,8 @@ classdef Inf_Dim_Prior_Model < Prior_Model & Sampler_Interface
         function this = Inf_Dim_Prior_Model(dim)
             arguments
                 dim = -1    % optional to preserve compatibility.
-                            % Only required if you need to use the
-                            % Sampler_Interface functionality
+                % Only required if you need to use the
+                % Sampler_Interface functionality
             end
             this.mass_mat_sqrt = Mass_Matrix_Sqrt(this);
             this.dim = dim;

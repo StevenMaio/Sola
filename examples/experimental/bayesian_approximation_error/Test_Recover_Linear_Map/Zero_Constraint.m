@@ -1,5 +1,5 @@
 classdef Zero_Constraint < Constraint
-    %LINEARIZED_CONSTRAINT undefined
+    % LINEARIZED_CONSTRAINT undefined
     %   undefined
 
     properties
@@ -7,6 +7,7 @@ classdef Zero_Constraint < Constraint
     end
 
     methods
+
         function this = Zero_Constraint(state_dim)
             this@Constraint();
             this.state_dim = state_dim;
@@ -21,7 +22,7 @@ classdef Zero_Constraint < Constraint
         end
 
         function [z_out] = c_z_Transpose_Apply(this, u_in, u, z)
-          z_out = false;
+            z_out = false;
         end
 
         function [u_out] = c_u_Inverse_Apply(this, u_in, u, z)
@@ -31,8 +32,6 @@ classdef Zero_Constraint < Constraint
         function [u_out] = c_z_Apply(this, z_in, u, z)
             u_out = false;
         end
-        
+
     end
 end
-
-

@@ -24,8 +24,8 @@ approx_cons = Zero_Constraint(state_dim);
 
 likelihood = BAE_Test_Likelihood(state_dim, 1:state_dim, sigma);
 
-bae_likelihood = BAE_Params_Only_Likelihood(...
-    full_cons, approx_cons, likelihood, prior, num_samples, d0);
+bae_likelihood = BAE_Params_Only_Likelihood( ...
+                                            full_cons, approx_cons, likelihood, prior, num_samples, d0);
 
 F_tilde = zeros(state_dim, param_dim);
 for i = 1:param_dim

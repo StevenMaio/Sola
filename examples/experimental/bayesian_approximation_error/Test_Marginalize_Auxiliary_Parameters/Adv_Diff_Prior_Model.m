@@ -22,12 +22,15 @@ classdef Adv_Diff_Prior_Model < Prior_Model
         function [m_out] = Prior_Covariance_Factor_Apply(this, m_in)
             m_out = this.sigma * m_in;
         end
+
     end
 
     methods (Access = public)
+
         function this = Adv_Diff_Prior_Model(mu, sigma)
             this.mu = mu;
             this.sigma = sigma;
         end
+
     end
 end
