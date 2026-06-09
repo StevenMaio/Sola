@@ -36,6 +36,10 @@ classdef BAE_Params_Only_Likelihood < Likelihood_Model
         M   % parameter weighted mass matrix
         b   % conditional correction term
         d   % observed data
+        % information
+        param_dim
+        state_dim
+        data_dim
     end
 
     methods (Access = public)
@@ -56,11 +60,21 @@ classdef BAE_Params_Only_Likelihood < Likelihood_Model
         end
 
         function [d_out] = Observation_Operator_Apply(this, u_in)
-            d_out = this.noise_likelihood.Observation_Operator_Apply(u_in);
+            d_out = zeros(this.data_dim, size(u_in, 2));
+            for i = 1:size(u_in, 2)
+                u = u_in(1:this.state_dim, i);
+                correction = u_in(this.state_dim+1:end, i);
+                observation = this.noise_likelihood.Observation_Operator_Apply(u);
+                d_out(:, i) = observation + correction;
+            end
         end
 
         function [u_out] = Observation_Operator_Transpose_Apply(this, d_in)
-            u_out = this.noise_likelihood.Observation_Operator_Transpose_Apply(d_in);
+            u_out = zeros(this.state_dim + this.data_dim, size(d_in, 2));
+            for i = 1:size(d_in, 2)
+              u1_out = this.noise_likelihood.Observation_Operator_Transpose_Apply(d_in(:, i));
+              u_out(:, i) = [u1_out; d_in(:, i)];
+            end
         end
 
         function [d] = Get_Observed_Data(this)
@@ -76,7 +90,7 @@ classdef BAE_Params_Only_Likelihood < Likelihood_Model
     methods (Access = public)
 
         function this = BAE_Params_Only_Likelihood(full_cons, approximate_cons, ...
-                                                   noise_likelihood, param_distr, num_samples, d, M)
+                noise_likelihood, param_distr, num_samples, d, param_dim, state_dim, data_dim)
             arguments
                 full_cons Constraint
                 approximate_cons Constraint
@@ -84,16 +98,21 @@ classdef BAE_Params_Only_Likelihood < Likelihood_Model
                 param_distr Sampler_Interface
                 num_samples
                 d               % data vector
-                M = @(m) m      % mass matrix
+                param_dim
+                state_dim
+                data_dim
             end
             this.noise_likelihood = noise_likelihood;
             this.param_distr = param_distr;
             this.num_samples = num_samples;
             this.d = d;
-            this.M = M;
+            this.param_dim = param_dim;
+            this.state_dim = state_dim;
+            this.data_dim = data_dim;
 
-            param_samples = zeros(num_samples, param_distr.Dimension());
-            err_samples = [];
+
+            param_samples = zeros(num_samples, param_dim);
+            err_samples = zeros(num_samples, data_dim);
 
             full_F = @(m) noise_likelihood.Observation_Operator_Apply(full_cons.State_Solve(m));
             approximate_F = @(m) noise_likelihood.Observation_Operator_Apply(approximate_cons.State_Solve(m));
@@ -123,8 +142,7 @@ classdef BAE_Params_Only_Likelihood < Likelihood_Model
         function [m_out] = Apply_Linear_Correction(this, m_in)
             % Applying G_em G_mm^{-1} to m_in
             temp = linsolve(this.G_mm, m_in);
-            temp = this.G_me' * temp;
-            [m_out, ~] = cgs(this.M, temp);
+            m_out = this.G_me' * temp;
         end
 
     end

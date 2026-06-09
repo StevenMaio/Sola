@@ -71,12 +71,12 @@ classdef Nonlinear_Poisson_Constraint < Constraint
 
     end
 
-    methods (Access = private)
+    methods (Access = public)
 
-        function [A] = Construct_Matrix(this, z)
+        function [A] = Construct_Matrix(this, m)
             A = this.S;
-            v = exp(z / 2);
-            A = diag(v) * A * diag(v);
+            v = exp(m);
+            A = diag(v) * A;
             % Apply lifting to maintain BCs
             A(1, :) = 0 * A(1, :);
             A(end, :) = 0 * A(end, :);

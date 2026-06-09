@@ -15,11 +15,11 @@ classdef BAE_Test_Likelihood < Likelihood_Model
     methods (Access = public)
 
         function [d_out] = Noise_Precision_Apply(this, d_in)
-            d_out = diag(1 / this.sigma^2) * d_in;
+            d_out = this.sigma^(-2) * d_in;
         end
 
         function [d_out] = Noise_Covariance_Apply(this, d_in)
-            d_out = diag(this.sigma^2) * d_in;
+            d_out = this.sigma^2 * d_in;
         end
 
         function [d_out] = Observation_Operator_Apply(this, u_in)

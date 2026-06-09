@@ -66,7 +66,7 @@ classdef Poisson_Prior_Model < Inf_Dim_Prior_Model
 
         function [z_out] = Matrix_Sqrt_Apply(this, z_in)
             temp = this.eigenvecs' * z_in;
-            temp = temp .* this.eigenvals;
+            temp = temp .* sqrt(this.eigenvals);
             z_out = this.eigenvecs * temp;
         end
 

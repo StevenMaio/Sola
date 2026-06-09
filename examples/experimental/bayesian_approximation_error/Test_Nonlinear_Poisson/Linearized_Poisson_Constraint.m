@@ -4,6 +4,8 @@ classdef Linearized_Poisson_Constraint < Constraint
         dim     % dimension of state and parameter
         z0      % point of linearization
         u0      % state at point of linearization
+        A       % bilinear form at linearization point
+        f       % source term
         M       % Mass matrix
         M0      % lifted mass matrix
     end
@@ -12,25 +14,27 @@ classdef Linearized_Poisson_Constraint < Constraint
         % abstract methods that need to be implemented
 
         function [u] = State_Solve(this, z)
-            u = (1 + this.z0 - z) .* this.u0;
+            rhs = this.M0 * (this.f .* (z - this.z0));
+            du = -linsolve(this.A, rhs);
+            u = this.u0 + du;
         end
 
         function [u_out] = c_u_Transpose_Inverse_Apply(this, u_in, u, z)
-            u_out = -u_in;
+            u_out = this.A * u_in;
         end
 
         function [z_out] = c_z_Transpose_Apply(this, u_in, u, z)
             temp = this.M0 * u_in;
-            temp = temp .* this.u0;
-            z_out = -linsolve(this.M, temp);
+            z_out = this.f .* temp;
         end
 
         function [u_out] = c_u_Inverse_Apply(this, u_in, u, z)
-            u_out = -u_in;
+            u_out = linsolve(this.A, u_in);
         end
 
         function [u_out] = c_z_Apply(this, z_in, u, z)
-            u_out = -this.u0 .* z_in;
+            temp = this.f .* z;
+            u_out = this.M0 * temp;
         end
 
         % Hess vec applies
@@ -54,11 +58,13 @@ classdef Linearized_Poisson_Constraint < Constraint
 
     methods
 
-        function this = Linearized_Poisson_Constraint(dim, z0, u0, M)
+        function this = Linearized_Poisson_Constraint(dim, z0, u0, A, f, M)
             this@Constraint();
             this.dim = dim;
             this.z0 = z0;
             this.u0 = u0;
+            this.A = A;
+            this.f = f;
             this.M = M;
             M0 = M;
             M0(:, 1) = 0 * M0(:, 1);

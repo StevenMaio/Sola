@@ -18,19 +18,19 @@ classdef Zero_Constraint < Constraint
         end
 
         function [u_out] = c_u_Transpose_Inverse_Apply(this, u_in, u, z)
-            u_out = false;
+            u_out = zeros(this.state_dim, 1);
         end
 
         function [z_out] = c_z_Transpose_Apply(this, u_in, u, z)
-            z_out = false;
+            z_out = zeros(this.state_dim, 1);
         end
 
         function [u_out] = c_u_Inverse_Apply(this, u_in, u, z)
-            u_out = false;
+            u_out = zeros(this.state_dim, 1);
         end
 
         function [u_out] = c_z_Apply(this, z_in, u, z)
-            u_out = false;
+            u_out = zeros(this.state_dim, 1);
         end
 
     end
