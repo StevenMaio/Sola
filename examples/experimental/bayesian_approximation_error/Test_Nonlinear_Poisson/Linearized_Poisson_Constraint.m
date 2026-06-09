@@ -1,40 +1,38 @@
 classdef Linearized_Poisson_Constraint < Constraint
 
     properties
-        dim     % dimension of state and parameter
-        z0      % point of linearization
-        u0      % state at point of linearization
-        A       % bilinear form at linearization point
-        f       % source term
-        M       % Mass matrix
-        M0      % lifted mass matrix
+        dim
+        M       % mass matrix
+        M0      % mass matrix with lifting
+        S0      % H1 inner product matrix with lifting
+        L
+        m0      % linearization point
+        u0      % state at linearization point
     end
 
     methods (Access = public)
         % abstract methods that need to be implemented
 
-        function [u] = State_Solve(this, z)
-            rhs = this.M0 * (this.f .* (z - this.z0));
-            du = -linsolve(this.A, rhs);
-            u = this.u0 + du;
+        function [u] = State_Solve(this, m)
+            rhs = this.M0 * (m - this.m0);
+            u = this.u0 + linsolve(this.L,  rhs);
         end
 
         function [u_out] = c_u_Transpose_Inverse_Apply(this, u_in, u, z)
-            u_out = this.A * u_in;
+            rhs = this.L' * this.M * u_in;
+            u_out = linsolve(this.M, rhs);
         end
 
         function [z_out] = c_z_Transpose_Apply(this, u_in, u, z)
-            temp = this.M0 * u_in;
-            z_out = this.f .* temp;
+            z_out = -this.M0' * u_in;
         end
 
         function [u_out] = c_u_Inverse_Apply(this, u_in, u, z)
-            u_out = linsolve(this.A, u_in);
+            u_out = linsolve(this.L, u_in);
         end
 
         function [u_out] = c_z_Apply(this, z_in, u, z)
-            temp = this.f .* z;
-            u_out = this.M0 * temp;
+            u_out = -this.M0 * z_in;
         end
 
         % Hess vec applies
@@ -58,21 +56,14 @@ classdef Linearized_Poisson_Constraint < Constraint
 
     methods
 
-        function this = Linearized_Poisson_Constraint(dim, z0, u0, A, f, M)
-            this@Constraint();
-            this.dim = dim;
-            this.z0 = z0;
+        function this = Linearized_Poisson_Constraint(nonlinear_cons, m0, u0)
+            this.dim = nonlinear_cons.dim;
+            this.M = nonlinear_cons.M;
+            this.M0 = nonlinear_cons.M0;
+            this.S0 = nonlinear_cons.S0;
+            this.L = this.S0 + 2 * this.M * diag(u0);
+            this.m0 = m0;
             this.u0 = u0;
-            this.A = A;
-            this.f = f;
-            this.M = M;
-            M0 = M;
-            M0(:, 1) = 0 * M0(:, 1);
-            M0(:, end) = 0 * M0(:, end);
-            % Maybe incorporate these?
-            % M0(1, 1) = 1;
-            % M0(end, end);
-            this.M0 = M0;
         end
 
     end
