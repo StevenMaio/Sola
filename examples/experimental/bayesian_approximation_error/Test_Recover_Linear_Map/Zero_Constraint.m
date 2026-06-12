@@ -3,14 +3,18 @@ classdef Zero_Constraint < Constraint
     %   undefined
 
     properties
+        param_dim
         state_dim
+        M
     end
 
     methods
 
-        function this = Zero_Constraint(state_dim)
+        function this = Zero_Constraint(param_dim, state_dim)
             this@Constraint();
+            this.param_dim = param_dim;
             this.state_dim = state_dim;
+            this.M = eye(param_dim);
         end
 
         function [u] = State_Solve(this, z)
@@ -18,19 +22,19 @@ classdef Zero_Constraint < Constraint
         end
 
         function [u_out] = c_u_Transpose_Inverse_Apply(this, u_in, u, z)
-            u_out = zeros(this.state_dim, 1);
+            u_out = zeros(this.state_dim, size(u_in, 2));
         end
 
         function [z_out] = c_z_Transpose_Apply(this, u_in, u, z)
-            z_out = zeros(this.state_dim, 1);
+            z_out = zeros(this.param_dim, size(u_in, 2));
         end
 
         function [u_out] = c_u_Inverse_Apply(this, u_in, u, z)
-            u_out = zeros(this.state_dim, 1);
+            u_out = zeros(this.state_dim, size(u_in, 2));
         end
 
         function [u_out] = c_z_Apply(this, z_in, u, z)
-            u_out = zeros(this.state_dim, 1);
+            u_out = zeros(this.state_dim, size(z_in, 2));
         end
 
     end

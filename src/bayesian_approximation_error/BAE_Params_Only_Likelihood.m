@@ -110,7 +110,6 @@ classdef BAE_Params_Only_Likelihood < Likelihood_Model
             this.state_dim = state_dim;
             this.data_dim = data_dim;
 
-
             param_samples = zeros(num_samples, param_dim);
             err_samples = zeros(num_samples, data_dim);
 
@@ -139,10 +138,10 @@ classdef BAE_Params_Only_Likelihood < Likelihood_Model
             this.b = this.Apply_Linear_Correction(this.m0);
         end
 
-        function [m_out] = Apply_Linear_Correction(this, m_in)
+        function [e_out] = Apply_Linear_Correction(this, m_in)
             % Applying G_em G_mm^{-1} to m_in
             temp = linsolve(this.G_mm, m_in);
-            m_out = this.G_me' * temp;
+            e_out = this.G_me' * temp;
         end
 
     end
