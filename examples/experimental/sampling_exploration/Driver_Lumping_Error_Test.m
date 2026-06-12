@@ -9,15 +9,15 @@ close all;
 rng(1324);
 
 n_u = 200;
-d = 3;
+d = 2;
 plot_sample = true;
 
 h = 1 / (n_u - 1);
 kappa_u = .2;
 
-nu = 2 - d / 2;
-C_d = 8 * nu;
-beta_u = kappa_u^2 / C_d;
+nu = 2 - d/2;
+C_d = 2 * nu;
+beta_u = kappa_u^2/C_d;
 
 [M, S] = Assemble_Mass_and_Stiffness(n_u);
 M = full(M);
@@ -69,7 +69,6 @@ rightColor = [0, 0, 0];                % color for percent_var
 
 indexSets = {1:T, (T + 1):m};
 firstPlotLastTick = [];
-sharedExponent = [];
 
 for k = 1:numel(indexSets)
     I = indexSets{k};
@@ -102,6 +101,7 @@ for k = 1:numel(indexSets)
     ax = gca;
     ax.XAxis.Exponent = 0;  % suppress automatic x10^n label
 
+<<<<<<< HEAD
     if k == 1
         xt = xticks;
         firstPlotLastTick = xt(end);
@@ -120,14 +120,36 @@ for k = 1:numel(indexSets)
     end
 
     % Use the same exponent for both plots
+=======
+if k == 1
+    xt = xticks;
+    firstPlotLastTick = xt(end);
+else
+>>>>>>> main
     xt = xticks;
     scaledTicks = xt / 10^sharedExponent;
     xticklabels(arrayfun(@(x) sprintf('$%.3g\\times10^{%d}$', x, sharedExponent), ...
                          scaledTicks, 'UniformOutput', false));
     ax.TickLabelInterpreter = 'latex';
 
+<<<<<<< HEAD
     % Force consistent diagonal labels
     ax.XTickLabelRotation = 35;
+=======
+% Compute exponent independently for this plot
+xt = xticks;
+maxTick = max(abs(xt));
+if maxTick > 0
+    thisExponent = floor(log10(maxTick));
+else
+    thisExponent = 0;
+end
+
+scaledTicks = xt / 10^thisExponent;
+xticklabels(arrayfun(@(x) sprintf('$%.3g\\times10^{%d}$', x, thisExponent), ...
+    scaledTicks, 'UniformOutput', false))
+ax.TickLabelInterpreter = 'latex';
+>>>>>>> main
 
     % Reserve fixed space for long rotated tick labels and x-label
     ax.Units = 'normalized';
