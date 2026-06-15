@@ -1,103 +1,59 @@
+%%
+% Test Nonlinear Poisson Inversion
+%   Test inversion of nonlinear Poisson problem using accurate model
+%
+%   author: Steven Maio
 clear;
 close all;
 
 addpath('../');
 
+rng(100);
+
 dim = 100;
-x = linspace(0, 1, 100)';
-l = 1e-3;
+x = linspace(0, 1, dim)';
 
-cons = Nonlinear_Poisson_Constraint(dim, l);
+cons = Nonlinear_Poisson_Constraint(dim);
 M = cons.M;
-m_nom = l^2 * (x.^2) .* (1 - x).^2 + 1;
+m0 = (x.^2) .* (1 - x).^2 + 2;
 
-u_nom = cons.State_Solve(m_nom);
+u0 = cons.State_Solve(m0);
 
-figure;
-hold;
-plot(x, x .* (1 - x) / 2);
-plot(x, u_nom);
-legend({'True u', 'Estimate'});
-
-diff = u_nom - (x .* (1 - x));
+diff = u0 - (x .* (1 - x));
 disp(diff' * M * diff);
 
-linearized_cons = Linearized_Poisson_Constraint(cons, m_nom, u_nom);
-
-scale = .1;   
-prior = Poisson_Prior_Model(cons, scale * (1/50), scale);
-
-% Compare linearization
-h = 1e-1;
-delta_m = h * prior.Sample();
-
-u = cons.State_Solve(m_nom + delta_m);
-u_tilde = linearized_cons.State_Solve(m_nom + delta_m);
+obs_vec = (5:5:95)';
+sigma = (max(u0) - min(u0)) * 1e-2;
+d0 = u0(obs_vec) + sigma * randn(size(obs_vec));
 
 figure;
-plot(x, u_nom);
 hold;
-plot(x, u);
-plot(x, u_tilde);
-legend({'$u(m_\mathrm{nom})$', '$u(m_\mathrm{nom}+\delta m)$', '$\tilde{u}(m_\mathrm{nom}+\delta m)$'}, ...
-       'Interpreter', 'latex');
-
-%m0 = m_nom + h * sin(4 * pi * x);
-m0 = m_nom + h * x .* (1 - x);
-obs_vec = (5:5:95)';
-u0 = cons.State_Solve(m0);
-d0 = u0(obs_vec);
-noise_lvl = 1;
-
-sigma = (noise_lvl / 100) * (max(d0) - min(d0));
-d0 = d0 + sigma * randn(size(d0));
-data_dim = numel(obs_vec);
+plot(x, u0);
+scatter(x(obs_vec), d0);
+legend({'$u$', '$d$'}, 'Interpreter', 'latex');
 
 likelihood = BAE_Test_Likelihood(dim, obs_vec, sigma);
 likelihood.d = d0;
+scale = 3.5;
+prior = Poisson_Prior_Model(cons, scale * 1e-1, scale);
 
-num_samples = 1000;
+inversion_problem = Bayesian_Inversion(likelihood, prior, cons);
+% something is going wrong here -- why do I need to turn this off?
+inversion_problem.opt.use_trust_region = false;
 
-bae_likelihood = BAE_Params_Only_Likelihood( ...
-                                            cons, linearized_cons, likelihood, ...
-                                            prior, num_samples, d0, ...
-                                            dim, dim, data_dim);
+[u_map, m_map] = inversion_problem.Compute_MAP_Point(ones(dim, 1));
 
-bae_cons = BAE_Correction_Constraint(linearized_cons, bae_likelihood);
+error = m0 - m_map;
+disp(error' * M * error)
 
-bae_inversion_problem = Bayesian_Inversion(bae_likelihood, prior, bae_cons);
-bae_inversion_problem.opt.iteration_limit = 100;
-bae_inversion_problem.opt.max_cg_iter = 100;
-bae_inversion_problem.opt.Gauss_Newton_Hess = true;
+figure
+hold
+plot(x, m0)
+plot(x, m_map)
+legend({'$m_0$', '$m_\mathrm{MAP}$'}, 'Interpreter', 'latex')
 
-inversion_problem = Bayesian_Inversion(likelihood, prior, linearized_cons);
-inversion_problem.opt.iteration_limit = 100;
-inversion_problem.opt.max_cg_iter = 100;
-inversion_problem.opt.Gauss_Newton_Hess = true;
-
-[~, bae_m_map] = bae_inversion_problem.Compute_MAP_Point(ones(dim, 1));
-[~, m_map] = inversion_problem.Compute_MAP_Point(ones(dim, 1));
-
-figure;
-hold;
-plot(x, m0);
-plot(x, bae_m_map);
-plot(x, m_map);
-legend({'$m_\mathrm{true}$', '$m_\mathrm{BAE}$', '$m_\mathrm{No BAE}$'}, 'Interpreter', 'latex');
-
-diff = m_map - m0;
-fprintf('No BAE Error: %.4e\n', diff' * M * diff);
-
-diff = bae_m_map - m0;
-fprintf('BAE Error: %.4e\n', diff' * M * diff);
-
-figure;
-plot(x, u0);
-hold;
-plot(x, cons.State_Solve(bae_m_map));
-plot(x, cons.State_Solve(m_map));
-scatter(x(obs_vec), d0);
-legend({'$u(m_\mathrm{true})$', '$u(m_\mathrm{BAE})$', '$u(m_\mathrm{No BAE})$'}, 'Interpreter', 'latex');
-
-diff = m_map - bae_m_map;
-fprintf('MAP Estimate Diff %.4e\n', diff' * M * diff);
+figure
+hold
+plot(x, u0)
+plot(x, u_map)
+legend({'$u(m_0)$', '$u(m_\mathrm{MAP})$'}, 'Interpreter', 'latex')

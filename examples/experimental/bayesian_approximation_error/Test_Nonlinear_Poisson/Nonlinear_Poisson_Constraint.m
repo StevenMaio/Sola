@@ -18,24 +18,23 @@ classdef Nonlinear_Poisson_Constraint < Constraint
             u(1) = 0;
             u(end) = 0;
             for i = 1:15
-                res = this.S0 * u + this.l * this.M * (u.^2) - this.M0 * m;
+                res = this.S0 * u + this.M * (u.^2) - this.M0 * m;
                 d = this.c_u_Inverse_Apply(-res, u, m);
                 u = u + d;
             end
         end
 
         function [u_out] = c_u_Transpose_Inverse_Apply(this, u_in, u, z)
-            L = this.S0 + this.l * 2 * this.M * diag(u);
-            temp = L' * this.M * u_in;
-            u_out = linsolve(this.M, temp);
+            L = this.S0 + 2 * this.M * diag(u);
+            u_out = linsolve(L', u_in);
         end
 
         function [z_out] = c_z_Transpose_Apply(this, u_in, u, z)
-            z_out = -this.M0 .* this.u0;
+            z_out = -this.M * u_in;
         end
 
         function [u_out] = c_u_Inverse_Apply(this, u_in, u, z)
-            L = this.S0 + this.l * 2 * this.M * diag(u);
+            L = this.S0 + 2 * this.M * diag(u);
             u_out = linsolve(L, u_in);
         end
 
@@ -43,15 +42,38 @@ classdef Nonlinear_Poisson_Constraint < Constraint
             u_out = -this.M0 .* z_in;
         end
 
+        function [con] = c(this, u, z)
+            con = this.S0 * u + this.M * (u.^2) - this.M0 * z;
+        end
+
+        function [u_out] = c_uu_Apply(this, u_in, u, z, lambda)
+            u_out = 2 * this.M * (u_in .* lambda);
+        end
+
+        function [u_out] = c_uz_Apply(this, z_in, u, z, lambda)
+            u_out = zeros(this.dim, 1);
+        end
+
+        function [z_out] = c_zu_Apply(this, u_in, u, z, lambda)
+            z_out = zeros(this.dim, 1);
+        end
+
+        function [z_out] = c_zz_Apply(this, z_in, u, z, lambda)
+            z_out = zeros(this.dim, 1);
+        end
+
     end
 
     methods
 
         function this = Nonlinear_Poisson_Constraint(dim, l)
+            arguments
+                dim
+                l = 1
+            end
             this@Constraint();
             this.x = linspace(0, 1, dim);
             this.dim = dim;
-            this.l = l;
 
             h = this.x(2) - this.x(1);
 
