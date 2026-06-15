@@ -3,7 +3,7 @@
 %%%%%%%%% Questions? Contact Joseph Hart (joshart@sandia.gov) %%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-classdef Prior_Model < handle
+classdef Prior_Model < Sampler_Interface
 
     % We assume a Bayesian inverse problem with a mean zero Gaussian noise
     % model and a linear observation operator
@@ -47,6 +47,10 @@ classdef Prior_Model < handle
             z_prior_mean = this.Get_Prior_Mean();
             Omega = randn(length(z_prior_mean), num_samps);
             Z_prior = this.Prior_Covariance_Factor_Apply(Omega) + z_prior_mean;
+        end
+
+        function [z_out] = Sample(this)
+            z_out = this.Compute_Prior_Samples(1);
         end
 
     end

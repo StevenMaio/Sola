@@ -1,6 +1,20 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%      Sola - Sandbox for Outer Loop Analysis         %%%%%%%%%
+%%%%%%%%% Questions? Contact Joseph Hart (joshart@sandia.gov) %%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%   Author(s):
+%       - Steven Maio (smaio@sandia.gov or smaio@ncsu.edu)
+
 classdef BAE_Correction_Constraint < Constraint
-    %BAE_CORRECTION_CONSTRAINT undefined
-    %   undefined
+    %BAE_CORRECTION_CONSTRAINT
+    %   Constraint class that handles the correction term due to BAE [1].
+    %   This class must be used with BAE_Likelihood_Model.
+    %
+    %   NOTE: We assume that the initial noise error has mean zero.
+    %
+    %   Sources:
+    %       [1]: Ruanui Nicholson et al 2023 Inverse Problems 39 054001
 
     properties
       cons

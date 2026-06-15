@@ -67,14 +67,12 @@ bae_likelihood = BAE_Likelihood_Model(cons, linearized_cons, likelihood, ...
 bae_cons = BAE_Correction_Constraint(linearized_cons, bae_likelihood);
 
 bae_inversion_problem = Bayesian_Inversion(bae_likelihood, prior, bae_cons);
-bae_inversion_problem.opt.iteration_limit = 250;
+bae_inversion_problem.opt.iteration_limit = 100;
 bae_inversion_problem.opt.max_cg_iter = 100;
-bae_inversion_problem.opt.Gauss_Newton_Hess = false;
 
 inversion_problem = Bayesian_Inversion(likelihood, prior, linearized_cons);
-inversion_problem.opt.iteration_limit = 250;
+inversion_problem.opt.iteration_limit = 100;
 inversion_problem.opt.max_cg_iter = 100;
-inversion_problem.opt.Gauss_Newton_Hess = false;
 
 [~, bae_m_map] = bae_inversion_problem.Compute_MAP_Point(ones(dim, 1));
 [~, m_map] = inversion_problem.Compute_MAP_Point(ones(dim, 1));

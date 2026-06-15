@@ -60,11 +60,6 @@ classdef Inf_Dim_Prior_Model < Prior_Model & Sampler_Interface
             z_out = this.Laplacian_Like_Inverse_Apply(tmp);
         end
 
-        function [z_out] = Sample(this)
-            z = randn(this.dim, 1);
-            z_out = this.Get_Prior_Mean() + this.Prior_Covariance_Factor_Apply(z);
-        end
-
         function dim = Dimension(this)
             dim = this.dim;
         end
