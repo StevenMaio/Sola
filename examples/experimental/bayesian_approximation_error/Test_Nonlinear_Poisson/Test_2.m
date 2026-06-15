@@ -60,10 +60,9 @@ likelihood.d = d0;
 
 num_samples = 1000;
 
-bae_likelihood = BAE_Params_Only_Likelihood( ...
-                                            cons, linearized_cons, likelihood, ...
-                                            prior, num_samples, d0, ...
-                                            dim, dim, data_dim);
+bae_likelihood = BAE_Likelihood_Model(cons, linearized_cons, likelihood, ...
+                                      prior, num_samples, d0, ...
+                                      dim, dim, data_dim);
 
 bae_cons = BAE_Correction_Constraint(linearized_cons, bae_likelihood);
 
@@ -73,7 +72,7 @@ bae_inversion_problem.opt.max_cg_iter = 100;
 bae_inversion_problem.opt.Gauss_Newton_Hess = false;
 
 inversion_problem = Bayesian_Inversion(likelihood, prior, linearized_cons);
-inversion_problem.opt.iteration_limit = 100;
+inversion_problem.opt.iteration_limit = 250;
 inversion_problem.opt.max_cg_iter = 100;
 inversion_problem.opt.Gauss_Newton_Hess = false;
 

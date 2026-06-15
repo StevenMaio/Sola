@@ -36,10 +36,9 @@ approx_cons = Zero_Constraint(param_dim, state_dim);
 likelihood = BAE_Test_Likelihood(state_dim, 1:state_dim, sigma);
 likelihood.d = d0;
 
-bae_likelihood = BAE_Params_Only_Likelihood( ...
-                                            full_cons, approx_cons, likelihood, ...
-                                            prior, num_samples, d0, ...
-                                            param_dim, state_dim, state_dim);
+bae_likelihood = BAE_Likelihood_Model(full_cons, approx_cons, likelihood, ...
+                                      prior, num_samples, d0, ...
+                                      param_dim, state_dim, state_dim);
 
 F_tilde = zeros(state_dim, param_dim);
 for i = 1:param_dim
@@ -66,4 +65,5 @@ plot(x, m0)
 hold
 plot(x, bae_m_map)
 plot(x, m_map)
-legend({'Truth', '$m_\mathrm{BAE}$', '$m_\mathrm{No BAE}$'}, 'interpreter', 'latex')
+legend({'$m_\mathrm{true}$', '$m_\mathrm{BAE}$', '$m_\mathrm{No BAE}$'}, ...
+    'interpreter', 'latex')
