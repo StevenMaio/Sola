@@ -37,5 +37,21 @@ classdef Zero_Constraint < Constraint
             u_out = zeros(this.state_dim, size(z_in, 2));
         end
 
+        function [u_out] = c_uu_Apply(this, u_in, u, z, lambda)
+            u_out = zeros(this.state_dim, size(u_in, 2));
+        end
+
+        function [u_out] = c_uz_Apply(this, z_in, u, z, lambda)
+            u_out = zeros(this.state_dim, size(z_in, 2));
+        end
+
+        function [z_out] = c_zu_Apply(this, u_in, u, z, lambda)
+            z_out = zeros(this.param_dim, size(u_in, 2));
+        end
+
+        function [z_out] = c_zz_Apply(this, z_in, u, z, lambda)
+            z_out = zeros(this.param_dim, size(z_in, 2));
+        end
+
     end
 end

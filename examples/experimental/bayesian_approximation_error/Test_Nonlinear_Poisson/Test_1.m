@@ -35,7 +35,7 @@ legend({'$u$', '$d$'}, 'Interpreter', 'latex');
 likelihood = BAE_Test_Likelihood(dim, obs_vec, sigma);
 likelihood.d = d0;
 scale = 3.5;
-prior = Poisson_Prior_Model(cons, scale * 1e-1, scale);
+prior = Poisson_Prior_Model(cons, scale * 8e-2, scale);
 
 inversion_problem = Bayesian_Inversion(likelihood, prior, cons);
 % something is going wrong here -- why do I need to turn this off?

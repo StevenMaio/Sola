@@ -10,7 +10,7 @@ rng(192);
 param_dim = 100;
 h = 1 / (param_dim - 1);
 state_dim = 500;
-noise_lvl = 5;
+noise_lvl = 1;
 num_samples = 1000;
 
 S = diag(2 * ones(1, param_dim)) + (-1) * diag(ones(1, param_dim - 1), 1) + (-1) * diag(ones(1, param_dim - 1), -1);
@@ -53,10 +53,10 @@ fprintf('BAE Diff: l2=%.4e max=%.4e\n', norm(F_tilde - A), max(max(abs(F_tilde-A
 bae_cons = BAE_Correction_Constraint(approx_cons, bae_likelihood);
 
 bae_inversion_problem = Bayesian_Inversion(bae_likelihood, prior, bae_cons);
-bae_inversion_problem.opt.Gauss_Newton_Hess = true;
+bae_inversion_problem.opt.Gauss_Newton_Hess = false;
 
 inversion_problem = Bayesian_Inversion(likelihood, prior, approx_cons);
-inversion_problem.opt.Gauss_Newton_Hess = true;
+inversion_problem.opt.Gauss_Newton_Hess = false;
 
 [~, bae_m_map] = bae_inversion_problem.Compute_MAP_Point(zeros(param_dim, 1));
 [~, m_map] = inversion_problem.Compute_MAP_Point(zeros(param_dim, 1));
