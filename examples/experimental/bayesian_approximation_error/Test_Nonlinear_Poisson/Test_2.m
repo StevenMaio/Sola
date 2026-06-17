@@ -68,11 +68,11 @@ bae_cons = BAE_Correction_Constraint(linearized_cons, bae_likelihood);
 
 bae_inversion_problem = Bayesian_Inversion(bae_likelihood, prior, bae_cons);
 bae_inversion_problem.opt.iteration_limit = 100;
-bae_inversion_problem.opt.max_cg_iter = 100;
+bae_inversion_problem.opt.max_cg_iter = 500;
 
 inversion_problem = Bayesian_Inversion(likelihood, prior, linearized_cons);
 inversion_problem.opt.iteration_limit = 100;
-inversion_problem.opt.max_cg_iter = 100;
+inversion_problem.opt.max_cg_iter = 500;
 
 [~, bae_m_map] = bae_inversion_problem.Compute_MAP_Point(ones(dim, 1));
 [~, m_map] = inversion_problem.Compute_MAP_Point(ones(dim, 1));
@@ -80,15 +80,16 @@ inversion_problem.opt.max_cg_iter = 100;
 figure;
 hold;
 plot(x, m0);
+plot(x, m_nom);
 plot(x, bae_m_map);
 plot(x, m_map);
-legend({'$m_\mathrm{true}$', '$m_\mathrm{BAE}$', '$m_\mathrm{No BAE}$'}, 'Interpreter', 'latex');
+legend({'$m_\mathrm{true}$', '$m_\mathrm{nom}$', '$m_\mathrm{BAE}$', '$m_\mathrm{No BAE}$'}, 'Interpreter', 'latex');
 
 diff = m_map - m0;
 fprintf('No BAE Error: %.4e\n', diff' * M * diff);
 
 diff = bae_m_map - m0;
-fprintf('BAE Error: %.4e\n', diff' * M * diff);
+fprintf('BAE Error:    %.4e\n', diff' * M * diff);
 
 figure;
 plot(x, u0);

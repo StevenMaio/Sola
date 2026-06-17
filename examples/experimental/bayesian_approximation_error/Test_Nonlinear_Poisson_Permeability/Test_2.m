@@ -46,7 +46,7 @@ legend({'$m_0$', '$m_\mathrm{nom}$', '$u_0$', '$d_0$'}, 'Interpreter', 'latex')
 
 % initialize prior
 scale = 1;
-prior = Poisson_Prior_Model(cons, scale * 2e-2, scale);
+prior = Poisson_Prior_Model(cons, scale * 1e-2, scale);
 prior.mean = m_nom;
 num_samples = 1000;
 
@@ -56,10 +56,12 @@ bae_cons = BAE_Correction_Constraint(linearized_cons, bae_likelihood);
 
 inversion_problem = Bayesian_Inversion(likelihood, prior, linearized_cons);
 bae_inversion_problem = Bayesian_Inversion(bae_likelihood, prior, bae_cons);
-bae_inversion_problem.opt.use_trust_region = false;
+bae_inversion_problem.opt.use_trust_region = true;
 
 inversion_problem.opt.iteration_limit = 100;
+inversion_problem.opt.max_cg_iter = 250;
 bae_inversion_problem.opt.iteration_limit = 100;
+bae_inversion_problem.opt.max_cg_iter = 250;
 
 [u_map, m_map] = inversion_problem.Compute_MAP_Point(m_nom);
 [u_bae, m_bae] = bae_inversion_problem.Compute_MAP_Point(m_nom);
@@ -83,3 +85,8 @@ plot(x, u_map)
 legend({'$u_0$', '$u_\mathrm{nom}$', ...
     '$u_\mathrm{BAE}$', '$u_\mathrm{No BAE}$'}, ...
     'Interpreter','latex')
+
+diff = m0 - m_bae;
+fprintf('BAE:    %.4e\n', diff' * M * diff);
+diff = m0 - m_map;
+fprintf('No BAE: %.4e\n', diff' * M * diff);
