@@ -3,7 +3,7 @@ close all;
 clc;
 
 addpath('../');
-addpath('../Test_Nonlinear_Poisson/');
+addpath('../Test_Nonlinear_State/')
 %% Test the simple forward problem
 rng(192);
 
@@ -22,7 +22,8 @@ A = randn(state_dim, param_dim);
 M = eye(param_dim);
 L = M + 1e-4 * S;
 
-prior = Gaussian_Distribution(zeros(param_dim, 1), L);
+cons = Nonlinear_Poisson_Constraint(param_dim);
+prior = BAE_Test_Prior(cons, 2e-1, 1);
 
 x = linspace(0, 1, param_dim)';
 m0 = sin(pi*x);

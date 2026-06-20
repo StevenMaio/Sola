@@ -5,6 +5,7 @@ clear;
 close all;
 
 addpath('../');
+addpath('../Test_Nonlinear_State/');
 %
 rng(1003)
 dim = 100;

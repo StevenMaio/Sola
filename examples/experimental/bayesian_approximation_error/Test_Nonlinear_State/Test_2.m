@@ -27,8 +27,9 @@ scale = 3.5;
 prior = Poisson_Prior_Model(cons, scale * 9e-2, scale);
 
 % Compare linearization
-h = 1e-1;
-m0 = m_nom + h * sin(pi / 2 * x);
+h = 5e-1;
+% m0 = m_nom + h * sin(pi / 2 * x);
+m0 = h * x;
 
 u0 = cons.State_Solve(m0);
 u_tilde = linearized_cons.State_Solve(m0);
@@ -80,10 +81,9 @@ inversion_problem.opt.max_cg_iter = 500;
 figure;
 hold;
 plot(x, m0);
-plot(x, m_nom);
 plot(x, bae_m_map);
 plot(x, m_map);
-legend({'$m_\mathrm{true}$', '$m_\mathrm{nom}$', '$m_\mathrm{BAE}$', '$m_\mathrm{No BAE}$'}, 'Interpreter', 'latex');
+legend({'$m_\mathrm{true}$', '$m_\mathrm{BAE}$', '$m_\mathrm{No BAE}$'}, 'Interpreter', 'latex');
 
 diff = m_map - m0;
 fprintf('No BAE Error: %.4e\n', diff' * M * diff);

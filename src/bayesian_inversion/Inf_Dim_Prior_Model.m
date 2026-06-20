@@ -3,7 +3,7 @@
 %%%%%%%%% Questions? Contact Joseph Hart (joshart@sandia.gov) %%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-classdef Inf_Dim_Prior_Model < Prior_Model & Sampler_Interface
+classdef Inf_Dim_Prior_Model < Prior_Model
 
     % We assume a Bayesian inverse problem with a mean zero Gaussian noise
     % model and a linear observation operator
@@ -58,10 +58,6 @@ classdef Inf_Dim_Prior_Model < Prior_Model & Sampler_Interface
         function [z_out] = Prior_Covariance_Factor_Apply(this, z_in)
             tmp = this.mass_mat_sqrt.Matrix_Sqrt_Apply(z_in);
             z_out = this.Laplacian_Like_Inverse_Apply(tmp);
-        end
-
-        function dim = Dimension(this)
-            dim = this.dim;
         end
 
     end

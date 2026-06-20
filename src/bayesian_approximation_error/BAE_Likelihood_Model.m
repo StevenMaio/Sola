@@ -90,12 +90,12 @@ classdef BAE_Likelihood_Model < Likelihood_Model
     methods (Access = public)
 
         function this = BAE_Likelihood_Model(full_cons, approximate_cons, ...
-                noise_likelihood, param_distr, num_samples, d, param_dim, state_dim, data_dim)
+                noise_likelihood, prior, num_samples, d, param_dim, state_dim, data_dim)
             arguments
                 full_cons Constraint
                 approximate_cons Constraint
                 noise_likelihood Likelihood_Model
-                param_distr Sampler_Interface
+                prior Prior_Model
                 num_samples
                 d               % data vector
                 param_dim
@@ -103,22 +103,21 @@ classdef BAE_Likelihood_Model < Likelihood_Model
                 data_dim
             end
             this.noise_likelihood = noise_likelihood;
-            this.param_distr = param_distr;
+            this.param_distr = prior;
             this.num_samples = num_samples;
             this.d = d;
             this.param_dim = param_dim;
             this.state_dim = state_dim;
             this.data_dim = data_dim;
 
-            param_samples = zeros(num_samples, param_dim);
+            param_samples = prior.Compute_Prior_Samples(num_samples)';
             err_samples = zeros(num_samples, data_dim);
 
             full_F = @(m) noise_likelihood.Observation_Operator_Apply(full_cons.State_Solve(m));
             approximate_F = @(m) noise_likelihood.Observation_Operator_Apply(approximate_cons.State_Solve(m));
 
             for i = 1:num_samples
-                m = param_distr.Sample();
-                param_samples(i, :) = m;
+                m = param_samples(i, :)';
                 err = full_F(m) - approximate_F(m);
                 err_samples(i, :) = err;
             end

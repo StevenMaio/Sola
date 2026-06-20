@@ -5,6 +5,7 @@ clear;
 close all;
 
 addpath('../');
+addpath('../Test_Nonlinear_Poisson/');
 % Initialize problem
 dim = 100;
 x = linspace(0, 1, dim)';
@@ -46,6 +47,7 @@ prior = Poisson_Prior_Model(cons, scale * 1e-1, scale);
 inversion_problem = Bayesian_Inversion(likelihood, prior, cons);
 inversion_problem.opt.Gauss_Newton_Hess = false;
 inversion_problem.opt.iteration_limit = 250;
+inversion_problem.opt.max_cg_iter = 150;
 
 init_guess = .7 * x + .2;
 [u_map, m_map] = inversion_problem.Compute_MAP_Point(init_guess);

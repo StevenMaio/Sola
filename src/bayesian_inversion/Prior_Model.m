@@ -3,7 +3,7 @@
 %%%%%%%%% Questions? Contact Joseph Hart (joshart@sandia.gov) %%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-classdef Prior_Model < Sampler_Interface
+classdef Prior_Model < handle
 
     % We assume a Bayesian inverse problem with a mean zero Gaussian noise
     % model and a linear observation operator
