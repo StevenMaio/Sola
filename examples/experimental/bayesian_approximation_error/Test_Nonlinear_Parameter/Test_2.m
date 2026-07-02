@@ -3,6 +3,7 @@
 %
 clear;
 close all;
+mkdir figures;
 
 addpath('../');
 addpath('../Test_Nonlinear_State/');
@@ -37,7 +38,7 @@ data_dim = numel(d0);
 likelihood = BAE_Test_Likelihood(dim, obs_vec, sigma);
 likelihood.d = d0;
 
-figure
+figure(1)
 hold
 plot(x, m0);
 plot(x, m_nom)
@@ -67,7 +68,7 @@ bae_inversion_problem.opt.max_cg_iter = 250;
 [u_map, m_map] = inversion_problem.Compute_MAP_Point(m_nom);
 [u_bae, m_bae] = bae_inversion_problem.Compute_MAP_Point(m_nom);
 
-figure
+figure(2)
 hold
 plot(x, m0)
 plot(x, m_nom)
@@ -77,7 +78,7 @@ legend({'$m_0$', '$m_\mathrm{nom}$', ...
     '$m_\mathrm{BAE}$', '$m_\mathrm{No BAE}$'}, ...
     'Interpreter','latex')
 
-figure
+figure(3)
 hold
 plot(x, u0)
 plot(x, u_nom)
@@ -91,3 +92,16 @@ diff = m0 - m_bae;
 fprintf('BAE:    %.4e\n', diff' * M * diff);
 diff = m0 - m_map;
 fprintf('No BAE: %.4e\n', diff' * M * diff);
+
+fig_names = {
+    'problem_setup'
+    'parameter_comparison'
+    'state_comparison'
+};
+problem = 'BAE';
+
+for i = 1:3
+    fig = figure(i);
+    filename = sprintf('figures/%s_%s.pdf', problem, fig_names{i});
+    exportgraphics(gcf, filename);
+end

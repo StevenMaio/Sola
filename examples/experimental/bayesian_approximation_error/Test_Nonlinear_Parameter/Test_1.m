@@ -3,6 +3,7 @@
 %
 clear;
 close all;
+mkdir figures;
 
 addpath('../');
 addpath('../Test_Nonlinear_Poisson/');
@@ -56,8 +57,7 @@ figure
 hold
 plot(x, m0)
 plot(x, m_map)
-plot(x, init_guess)
-legend({'$m_0$', '$m_\mathrm{MAP}$', '$m_\mathrm{init}$'}, 'Interpreter', 'latex');
+legend({'$m_0$', '$m_\mathrm{MAP}$'}, 'Interpreter', 'latex');
 
 diff = m0 - m_map;
 fprintf('m_map err: %.4e\n', diff' * M * diff);
@@ -70,6 +70,19 @@ u_init = cons.State_Solve(init_guess);
 hold
 plot(x, u0)
 plot(x, u_map)
-plot(x, u_init)
-legend({'$u_0$', '$u_\mathrm{MAP}$', '$u_\mathrm{init}$'}, ...
+legend({'$u_0$', '$u_\mathrm{MAP}$'}, ...
     'interpreter', 'latex');
+
+
+fig_names = {
+    'problem_setup'
+    'parameter_comparison'
+    'state_comparison'
+    };
+problem = 'No_BAE';
+
+for i = 1:3
+    fig = figure(i);
+    filename = sprintf('figures/%s_%s.pdf', problem, fig_names{i});
+    exportgraphics(gcf, filename);
+end

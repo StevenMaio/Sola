@@ -29,8 +29,8 @@ prior = Poisson_Prior_Model(cons, scale * 8e-2, scale);
 
 % Compare linearization
 h = 5e-1;
-% m0 = m_nom + h * sin(pi / 2 * x);
-m0 = h * x;
+m0 = m_nom + h * sin(pi / 2 * x);
+% m0 = h * x;
 
 u0 = cons.State_Solve(m0);
 u_tilde = linearized_cons.State_Solve(m0);
@@ -88,10 +88,10 @@ legend({'$m_\mathrm{true}$', '$m_\mathrm{BAE}$', '$m_\mathrm{No BAE}$'}, ...
     'Interpreter', 'latex', 'FontSize', 24, 'Location', 'southeast');
 
 diff = m_map - m0;
-fprintf('No BAE Error: abs=%.4e; rel=%.4e\n', diff' * M * diff, diff' * M * diff / (m0' * M * m0));
+fprintf('No BAE Error: %.4e\n', diff' * M * diff);
 
 diff = bae_m_map - m0;
-fprintf('BAE Error: %.4e; rel= %.4e\n', diff' * M * diff,  diff' * M * diff / (m0' * M * m0));
+fprintf('BAE Error:    %.4e\n', diff' * M * diff);
 
 figure(4);
 plot(x, u0);
@@ -102,8 +102,12 @@ scatter(x(obs_vec), d0);
 legend({'$u(m_\mathrm{true})$', '$u(m_\mathrm{BAE})$', '$u(m_\mathrm{No BAE})$'}, ...
     'Interpreter', 'latex', 'FontSize', 24, 'Location', 'south');
 
-diff = m_map - bae_m_map;
-fprintf('MAP Estimate Diff %.4e\n', diff' * M * diff);
+diff = m_map - m0;
+fprintf('No BAE Error: abs=%.4e; rel=%.4e\n', diff' * M * diff, diff' * M * diff / (m0' * M * m0));
+
+diff = bae_m_map - m0;
+fprintf('BAE Error: %.4e; rel= %.4e\n', diff' * M * diff,  diff' * M * diff / (m0' * M * m0));
+
 
 fig_names = {
     'linearization_comparison'
@@ -111,7 +115,7 @@ fig_names = {
     'parameter_comparison'
     'state_comparison'
 };
-problem = 'Test2';
+problem = 'Test3';
 
 for i = 2:4
     fig = figure(i);

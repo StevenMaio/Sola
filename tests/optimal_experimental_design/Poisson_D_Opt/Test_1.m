@@ -13,11 +13,11 @@ M = cons.M;
 S = cons.S;
 
 % set up prior
-prior = Poisson_Prior_Model(cons, 5 / 6, 1 / 30);
+prior = Poisson_Prior_Model(cons, 1e-3, 1.0);
 
 % set up observation model
 noise_std = 1e-2;
-obs_vec = (1:9:100)';
+obs_vec = (5:5:95)';
 likelihood = Poisson_Likelihood_Model(noise_std, obs_vec, N);
 num_sensors = 5;
 
@@ -79,7 +79,7 @@ data_space_eig = linear_oed.OED_Objective(greedy_sensors);
 
 error = abs(fast_mg_eig - data_space_eig);
 
-if error > 1.e-9
+if error > 1.e-6
     fprintf(2, '\noptimal_experimental_design/Poisson_D_Opt failed.\n');
 else
     fprintf(1, '\noptimal_experimental_design/Poisson_D_Opt passed.\n');

@@ -20,6 +20,7 @@ classdef Linear_OED_D_Opt < handle
         prior
         con
         num_sensors
+        use_lazy    % can only use if noise is diagonal
 
         u_dim
         z_dim
@@ -32,7 +33,12 @@ classdef Linear_OED_D_Opt < handle
 
     methods (Access = public)
 
-        function this = Linear_OED_D_Opt(bayesian_inversion, num_sensors)
+        function this = Linear_OED_D_Opt(bayesian_inversion, num_sensors, use_lazy)
+            arguments
+                bayesian_inversion Bayesian_Inversion
+                num_sensors
+                use_lazy = true
+            end
             this.bayesian_inversion = bayesian_inversion;
             this.likelihood = bayesian_inversion.likelihood;
             this.prior = bayesian_inversion.prior;
@@ -40,7 +46,7 @@ classdef Linear_OED_D_Opt < handle
             this.num_sensors = num_sensors;
             z = this.prior.Get_Prior_Mean();
             this.z_dim = length(z);
-            u = this.con.c_z_Apply(z);
+            u = this.con.State_Solve(z);
             this.u_dim = length(u);
             d = this.likelihood.Observation_Operator_Apply(u);
             this.d_dim = length(d);
@@ -53,8 +59,8 @@ classdef Linear_OED_D_Opt < handle
                 temp(i) = 1.0;
                 temp = this.likelihood.Observation_Operator_Transpose_Apply(temp);
                 % Compute adjoint of solution map
-                temp = this.con.c_u_Transpose_Inverse_Apply(temp);
-                temp = -this.con.c_z_Transpose_Apply(temp);
+                temp = this.con.c_u_Transpose_Inverse_Apply(temp, u, z);
+                temp = -this.con.c_z_Transpose_Apply(temp, u, z);
                 temp = this.prior.Mass_Matrix_Inverse_Apply(temp);
                 temp = this.prior.Prior_Covariance_Apply(temp);
                 temp = this.con.State_Solve(temp);
@@ -73,14 +79,20 @@ classdef Linear_OED_D_Opt < handle
         end
 
         function [val] = OED_Objective(this, w)
-            temp = det((this.Fm_cov(w, w)) + this.G_noise(w, w)) / det(this.G_noise(w, w));
-            val = 0.5 * log(temp);
+            temp = log(det(this.Fm_cov(w, w) + this.G_noise(w, w))) - log(det(this.G_noise(w, w)));
+            val = 0.5 * temp;
         end
 
-        function [w] = Optimize_Design(this)
-            w = Lazy_Greedy_Solve_Cardinality_Cons(@(S) this.OED_Objective(S), ...
-                                                   this.d_dim, ...
-                                                   this.num_sensors);
+        function [w, eig] = Optimize_Design(this)
+            if this.use_lazy
+                [w, eig] = Lazy_Greedy_Solve_Cardinality_Cons(@(S) this.OED_Objective(S), ...
+                                                              this.d_dim, ...
+                                                              this.num_sensors);
+            else
+                [w, eig] = Greedy_Solve_Cardinality_Cons(@(S) this.OED_Objective(S), ...
+                                                         this.d_dim, ...
+                                                         this.num_sensors);
+            end
         end
 
     end

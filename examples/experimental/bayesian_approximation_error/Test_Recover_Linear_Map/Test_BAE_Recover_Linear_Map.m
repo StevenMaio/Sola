@@ -4,6 +4,8 @@ clc;
 
 addpath('../');
 addpath('../Test_Nonlinear_State/')
+
+mkdir figures;
 %% Test the simple forward problem
 rng(192);
 
@@ -19,11 +21,9 @@ S(end, end) = .5 * S(end, end);
 S = (1 / h) * S;
 
 A = randn(state_dim, param_dim);
-M = eye(param_dim);
-L = M + 1e-4 * S;
 
 cons = Nonlinear_Poisson_Constraint(param_dim);
-prior = BAE_Test_Prior(cons, 2e-1, 1);
+prior = Poisson_Prior_Model(cons, 2e-1, 1);
 
 x = linspace(0, 1, param_dim)';
 m0 = sin(pi*x);
@@ -49,6 +49,7 @@ for i = 1:param_dim
 end
 
 fprintf('BAE Diff: l2=%.4e max=%.4e\n', norm(F_tilde - A), max(max(abs(F_tilde-A))));
+fprintf('BAE Diff: rel_l2=%.4e rel_max=%.4e\n', norm(F_tilde - A)/norm(A), max(max(abs(F_tilde-A)))/max(max(abs(A))));
 
 bae_cons = BAE_Correction_Constraint(approx_cons, bae_likelihood);
 
@@ -61,10 +62,15 @@ inversion_problem.opt.Gauss_Newton_Hess = false;
 [~, bae_m_map] = bae_inversion_problem.Compute_MAP_Point(zeros(param_dim, 1));
 [~, m_map] = inversion_problem.Compute_MAP_Point(zeros(param_dim, 1));
 
-figure
+figure(1)
 plot(x, m0)
 hold
 plot(x, bae_m_map)
 plot(x, m_map)
 legend({'$m_\mathrm{true}$', '$m_\mathrm{BAE}$', '$m_\mathrm{No BAE}$'}, ...
-    'interpreter', 'latex')
+    'interpreter', 'latex', 'FontSize', 20)
+
+set(gca, 'fontsize', 20)
+
+
+exportgraphics(gcf, 'figures/recover_linear_map.pdf');

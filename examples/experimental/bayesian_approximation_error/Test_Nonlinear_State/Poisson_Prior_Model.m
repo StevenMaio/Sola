@@ -10,6 +10,7 @@ classdef Poisson_Prior_Model < Inf_Dim_Prior_Model
         L
         eigenvecs
         eigenvals
+        mean
     end
 
     methods (Access = public)
@@ -44,7 +45,7 @@ classdef Poisson_Prior_Model < Inf_Dim_Prior_Model
         end
 
         function [z_prior_mean] = Get_Prior_Mean(this)
-            z_prior_mean = zeros(this.poisson_con.dim, 1);
+            z_prior_mean = this.mean;
         end
 
     end
@@ -58,6 +59,7 @@ classdef Poisson_Prior_Model < Inf_Dim_Prior_Model
             [V, D] = eig(poisson_con.M);
             this.eigenvecs = V;
             this.eigenvals = diag(D);
+            this.mean = zeros(this.poisson_con.dim, 1);
         end
 
     end
